@@ -1,0 +1,477 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Arabe Facile API",
+    "version": "1.0.0",
+    "description": "Documentation de l'API pour la plateforme d'apprentissage de la langue arabe."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Serveur local pour le développement"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Utilisateurs",
+      "description": "Gestion des utilisateurs (inscription, connexion, profils)"
+    },
+    {
+      "name": "Cours",
+      "description": "Gestion des cours et contenus pédagogiques"
+    },
+    {
+      "name": "Messages",
+      "description": "Gestion des messages entre utilisateurs"
+    },
+    {
+      "name": "Paiements",
+      "description": "Gestion des paiements en ligne"
+    },
+    {
+      "name": "Admin",
+      "description": "Fonctionnalités réservées aux administrateurs"
+    }
+  ],
+  "paths": {
+    "/api/users/register": {
+      "post": {
+        "tags": ["Utilisateurs"],
+        "summary": "Inscription d'un utilisateur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["student", "teacher", "admin"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Inscription réussie. Veuillez vérifier votre email."
+          },
+          "400": {
+            "description": "Email déjà utilisé ou données invalides."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": ["Utilisateurs"],
+        "summary": "Connexion d'un utilisateur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie. Token JWT retourné."
+          },
+          "400": {
+            "description": "Email ou mot de passe incorrect."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/users/profile": {
+      "get": {
+        "tags": ["Utilisateurs"],
+        "summary": "Obtenir le profil de l'utilisateur connecté",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil utilisateur récupéré avec succès."
+          },
+          "401": {
+            "description": "Non autorisé."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/courses": {
+      "post": {
+        "tags": ["Cours"],
+        "summary": "Ajouter un cours (réservé aux enseignants et admins)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "lessons": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "audioUrl": {
+                          "type": "string"
+                        },
+                        "pdfUrl": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cours ajouté avec succès."
+          },
+          "400": {
+            "description": "Données invalides."
+          },
+          "403": {
+            "description": "Permission refusée."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/courses/{id}": {
+      "put": {
+        "tags": ["Cours"],
+        "summary": "Modifier un cours (réservé aux enseignants et admins)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "lessons": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "audioUrl": {
+                          "type": "string"
+                        },
+                        "pdfUrl": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ,
+        "responses": {
+          "200": {
+            "description": "Cours modifié avec succès."
+          },
+          "400": {
+            "description": "Données invalides."
+          },
+          "403": {
+            "description": "Permission refusée."
+          },
+          "404": {
+            "description": "Cours non trouvé."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Cours"],
+        "summary": "Supprimer un cours (réservé aux enseignants et admins)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours supprimé avec succès."
+          },
+          "403": {
+            "description": "Permission refusée."
+          },
+          "404": {
+            "description": "Cours non trouvé."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/messages/send": {
+      "post": {
+        "tags": ["Messages"],
+        "summary": "Envoyer un message",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipient": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message envoyé avec succès."
+          },
+          "400": {
+            "description": "Données invalides."
+          },
+          "401": {
+            "description": "Non autorisé."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/messages/{recipientId}": {
+      "get": {
+        "tags": ["Messages"],
+        "summary": "Lire les messages avec un utilisateur spécifique",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recipientId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des messages récupérée avec succès."
+          },
+          "401": {
+            "description": "Non autorisé."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/payments/create-payment-intent": {
+      "post": {
+        "tags": ["Paiements"],
+        "summary": "Créer une intention de paiement avec Stripe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Intention de paiement créée avec succès."
+          },
+          "400": {
+            "description": "Données invalides."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Lister tous les utilisateurs (réservé aux admins)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs récupérée avec succès."
+          },
+          "403": {
+            "description": "Permission refusée."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/api/admin/stats": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Obtenir les statistiques d'utilisation (réservé aux admins)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiques récupérées avec succès."
+          },
+          "403": {
+            "description": "Permission refusée."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}}
